@@ -1,0 +1,13 @@
+{
+  "name": "Nombre Numérico",
+  "short_name": "Nombre Numérico",
+  "description": "Convierte las letras de nombres en sus números correspondientes.",
+  "lang": "es",
+  "start_url": "./NombreNumerico.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#168b83",
+  "background_color": "#f3f7fa",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

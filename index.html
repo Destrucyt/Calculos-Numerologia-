@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#168b83"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Nombre Numérico"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon.svg">
+<title>Nombre Numérico</title>
+<style>
+:root{font-family:Segoe UI,Arial,sans-serif;color:#192a3a;background:#f3f7fa}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}.app{width:min(900px,100%);background:white;border:1px solid #dce6ee;border-radius:22px;box-shadow:0 20px 60px #19334a17;padding:32px}.brand{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#168b83}.title{font-size:32px;margin:8px 0}.sub{color:#66798a;margin:0 0 24px}.label{display:block;font-weight:650;margin-bottom:8px}input{width:100%;padding:15px 16px;border:1px solid #cbd8e2;border-radius:12px;font-size:19px;outline:none}input:focus{border-color:#168b83;box-shadow:0 0 0 3px #168b8320}.legend{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0;color:#526577;font-size:14px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:#ed9b46}.dot.v{background:#168b83}.result{min-height:185px;border:1px solid #e0e9ef;border-radius:16px;background:#fbfdfe;padding:22px;display:flex;align-items:center;justify-content:center;overflow:auto}.words{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}.word{display:flex;gap:4px}.cell{width:36px;height:80px;display:grid;grid-template-rows:24px 32px 24px;text-align:center;align-items:center;flex:none}.num{font-size:16px;font-weight:750;color:#d9862d}.num.v{color:#168b83}.letter{font-size:25px;font-weight:650;color:#243a4d}.blank{color:#b8c4ce}.hint{text-align:center;color:#80909d;font-size:13px;margin-top:12px}.table{margin-top:24px;border-top:1px solid #e5edf2;padding-top:18px}.table h2{font-size:15px;margin:0 0 12px}.groups{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.group{background:#f5f8fa;border-radius:9px;padding:9px;text-align:center;font-size:13px}.group b{display:block;color:#168b83;font-size:16px;margin-bottom:4px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}button{border:0;border-radius:9px;padding:10px 14px;background:#e9f3f2;color:#147970;font-weight:650;cursor:pointer}button:hover{background:#d8eeeb}@media(max-width:560px){.app{padding:22px 16px}.title{font-size:27px}.groups{grid-template-columns:repeat(3,1fr)}.cell{width:30px}}
+</style>
+</head>
+<body><main class="app">
+<div class="brand">Herramienta de nombres</div><h1 class="title">Nombre Numérico</h1><p class="sub">Cada letra tiene un número. Las consonantes lo muestran arriba y las vocales abajo.</p>
+<label class="label" for="name">Escribe un nombre o frase</label><input id="name" type="text" placeholder="Por ejemplo: Jose Miguel" autocomplete="off" autofocus>
+<div class="legend"><span><i class="dot"></i>Consonante: número arriba</span><span><i class="dot v"></i>Vocal: número abajo</span></div>
+<section class="result" aria-live="polite"><div id="result" class="words"></div></section><div class="hint">Los acentos se respetan y se calculan como su vocal base.</div>
+<div class="actions"><button id="copy">Copiar resultado</button></div>
+<section class="table"><h2>Tabla de equivalencias</h2><div class="groups" id="groups"></div></section>
+</main><script>
+const groups={1:'A J S',2:'B K T',3:'C L U',4:'D M V',5:'E N W',6:'F O X',7:'G P Y',8:'H Q Z',9:'I R'};
+const map={};for(const [n,letters] of Object.entries(groups))for(const ch of letters.split(' '))map[ch]=n;
+const vowels=new Set(['A','E','I','O','U']);
+const input=document.querySelector('#name'),out=document.querySelector('#result');
+document.querySelector('#groups').innerHTML=Object.entries(groups).map(([n,ls])=>`<div class="group"><b>${n}</b>${ls.replaceAll(' ',' · ')}</div>`).join('');
+function render(){const value=input.value.trim();if(!value){out.innerHTML='<span class="blank">Tu nombre aparecerá aquí</span>';return}out.innerHTML=value.split(/\s+/).map(word=>`<span class="word">${Array.from(word).map(ch=>{const upper=ch.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(),n=map[upper],v=vowels.has(upper);return `<span class="cell"><span class="num ${v?'':'blank'}">${n&&!v?n:''}</span><span class="letter">${ch}</span><span class="num ${v?'v':'blank'}">${n&&v?n:''}</span></span>`}).join('')}</span>`).join('')}
+input.addEventListener('input',render);render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./service-worker.js');
+document.querySelector('#copy').addEventListener('click',async()=>{const raw=input.value.trim();if(!raw)return;const value=Array.from(raw).map(ch=>{const u=ch.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(),n=map[u];return n?`${ch}(${n})`:ch}).join('');try{await navigator.clipboard.writeText(value);document.querySelector('#copy').textContent='¡Copiado!';setTimeout(()=>document.querySelector('#copy').textContent='Copiar resultado',1400)}catch{}});
+</script></body></html>
